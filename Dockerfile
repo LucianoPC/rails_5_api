@@ -1,8 +1,21 @@
-from debian:sid
+from ruby:2.3
 
-RUN apt-get install ruby ruby-dev build-essential nodejs ruby-nokogiri \
-    ruby-nio4r ruby-websocket-extensions ruby-websocket-driver ruby-bcrypt \
-    postgresql-server-dev-all sqlite3 libsqlite3-dev openssl libssl-dev \
-    libssl1.0.2 -y
+RUN apt-get update
+
+RUN apt-get install -y nodejs --no-install-recommends
+RUN apt-get install -y sqlite3 --no-install-recommends
+RUN rm -rf /var/lib/apt/lists/*
 
 RUN gem install rails
+
+RUN mkdir /usr/src/app/
+WORKDIR /usr/src/app/
+
+COPY Gemfile /usr/src/app/
+
+RUN bundle install
+
+COPY . /usr/src/app/
+
+EXPOSE 3000
+ENTRYPOINT rails s
